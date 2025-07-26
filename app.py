@@ -9,6 +9,9 @@ import re
 import pandas as pd
 import plotly.express as px
 from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 st.markdown("""
     <style>
     .main-header {
