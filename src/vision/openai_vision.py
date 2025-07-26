@@ -24,17 +24,18 @@ def analyze_screenshot_with_openai_vision(image_path, prompt=None, api_key=None,
             "(such as color contrast, missing alt text, focus indicators, etc.) and provide a concise report."
         )
 
-    with open(image_path, "rb") as img_file:
-        image_bytes = img_file.read()
-
+    import base64
     client = openai.OpenAI(api_key=api_key)
+    with open(image_path, "rb") as img_file:
+        image_base64 = base64.b64encode(img_file.read()).decode("utf-8")
+
     response = client.chat.completions.create(
         model=model,
         messages=[
             {"role": "system", "content": "You are an expert accessibility auditor."},
             {"role": "user", "content": [
                 {"type": "text", "text": prompt},
-                {"type": "image_file", "image": image_bytes}
+                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{image_base64}"}}
             ]}
         ],
         max_tokens=800

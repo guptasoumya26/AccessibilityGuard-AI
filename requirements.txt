@@ -4,3 +4,5 @@ streamlit
 pillow
 requests
 flask
+python-dotenv
+plotly
