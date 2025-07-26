@@ -9,8 +9,8 @@ def home():
     <head><title>Demo Web App - Base</title></head>
     <body>
         <h1>Welcome to the Base Version</h1>
-        <button style="color: white; background: #007bff;">Accessible Button</button>
-        <img src="/static/logo.png" alt="Placeholder image">
+        <button style="color: #eee; background: #fff;">Low Contrast Button</button>
+        <img src="/static/logo.png">
         <p>Tab to the button to see a visible focus indicator.</p>
         <style>
             button:focus { outline: 2px solid #ff9800; }
