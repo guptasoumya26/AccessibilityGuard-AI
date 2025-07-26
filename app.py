@@ -57,15 +57,22 @@ run_btn = st.button("Compare Accessibility")
 def diff_reports(base_report, pr_report):
     # Clean and filter out "No issue found." entries and empty lines
     base_points = [line.strip() for line in base_report.splitlines() 
-                   if line.strip() and "no issue found" not in line.lower()]
+                   if line.strip() and "no issue found" not in line.lower() 
+                   and "no significant accessibility issues" not in line.lower()]
     pr_points = [line.strip() for line in pr_report.splitlines() 
-                 if line.strip() and "no issue found" not in line.lower()]
+                 if line.strip() and "no issue found" not in line.lower()
+                 and "no significant accessibility issues" not in line.lower()]
     
-    # Convert to sets for comparison
+    # If base has no issues but PR has issues, all PR issues are new
+    if not base_points and pr_points:
+        return "\n".join(pr_points)
+    
+    # If both have no issues
+    if not base_points and not pr_points:
+        return "No new accessibility issues found!"
+    
+    # Compare and find new issues
     base_set = set(base_points)
-    pr_set = set(pr_points)
-    
-    # Find issues that are in PR but not in base
     new_issues = [issue for issue in pr_points if issue not in base_set]
     
     return "\n".join(new_issues) if new_issues else "No new accessibility issues found!"
@@ -100,19 +107,30 @@ if run_btn and base_url and pr_url:
     st.info("Step 2: Analyzing with Vision LLM...")
     try:
         api_key = os.getenv("OPENAI_API_KEY")
-        custom_prompt = (
-            "Analyze this web page screenshot for accessibility issues. "
-            "Be very specific and only mention issues you can actually see and verify in this screenshot. "
-            "For each issue, describe the exact element or location where the problem occurs. "
-            "Examples: 'Button at top-right has insufficient color contrast (appears to be light gray on white)', "
-            "'Image in the main content area lacks visible alt text indicator', "
-            "'Form input field at [location] has no visible label'. "
-            "Do not make generic assumptions - only report what you can specifically observe. "
-            "List up to 5 concrete, location-specific accessibility problems. "
+        
+        # First, analyze the base version to establish a baseline
+        base_prompt = (
+            "Analyze this web page screenshot and identify any visible accessibility issues. "
+            "Focus on what you can actually observe in the interface. "
+            "If the page appears to have no obvious accessibility problems, simply state 'No significant accessibility issues observed.' "
+            "Be specific about locations and elements if issues are found."
+        )
+        
+        # Then analyze the PR version with more detailed scrutiny
+        pr_prompt = (
+            "Analyze this web page screenshot for accessibility issues with particular attention to: "
+            "1. New UI elements or changes that might have accessibility problems "
+            "2. Color contrast issues in buttons, text, or interactive elements "
+            "3. Missing visual indicators for form fields, buttons, or interactive areas "
+            "4. Layout or design changes that could impact accessibility "
+            "5. Any new content that lacks proper visual cues "
+            "Be very specific about the location and nature of any issues you observe. "
+            "Only report issues you can actually see and verify in this screenshot. "
             "Format as a numbered list."
         )
-        base_report = analyze_screenshot_with_openai_vision(base_screenshot, api_key=api_key, prompt=custom_prompt)
-        pr_report = analyze_screenshot_with_openai_vision(pr_screenshot, api_key=api_key, prompt=custom_prompt)
+        
+        base_report = analyze_screenshot_with_openai_vision(base_screenshot, api_key=api_key, prompt=base_prompt)
+        pr_report = analyze_screenshot_with_openai_vision(pr_screenshot, api_key=api_key, prompt=pr_prompt)
 
         col3, col4 = st.columns(2)
         with col3:
@@ -125,6 +143,11 @@ if run_btn and base_url and pr_url:
                                   title='Base: Accessibility Issue Types', color='Type',
                                   labels={'count': 'Count'}, height=300)
                 st.plotly_chart(base_fig, use_container_width=True)
+            else:
+                # Add some visual content when no issues are found
+                st.success("✅ No significant accessibility issues detected in the base version")
+                st.info("💡 **This is good!** The base version appears to have a solid accessibility foundation.")
+                
         with col4:
             st.subheader("PR Report")
             st.write(pr_report)
@@ -135,6 +158,10 @@ if run_btn and base_url and pr_url:
                                 title='PR: Accessibility Issue Types', color='Type',
                                 labels={'count': 'Count'}, height=300)
                 st.plotly_chart(pr_fig, use_container_width=True)
+            else:
+                # Add visual content when no issues in PR either
+                st.success("✅ No accessibility issues detected in the PR version")
+                st.info("💡 **Excellent!** This PR maintains good accessibility standards.")
 
         st.subheader("🆕 New Accessibility Issues in PR:")
         st.code(diff_reports(base_report, pr_report))
