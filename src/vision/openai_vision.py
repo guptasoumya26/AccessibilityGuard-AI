@@ -3,20 +3,10 @@ import openai
 import os
 
 def analyze_screenshot_with_openai_vision(image_path, prompt=None, api_key=None, model="gpt-4o"):
-    """
-    Analyzes a screenshot for accessibility issues using OpenAI Vision models.
-    Args:
-        image_path (str): Path to the screenshot image file.
-        prompt (str): Optional prompt to guide the analysis.
-        api_key (str): OpenAI API key. If None, uses OPENAI_API_KEY env var.
-        model (str): OpenAI vision model to use (default: gpt-4o).
-    Returns:
-        str: The model's response (analysis of the image).
-    """
     if api_key is None:
         api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        raise ValueError("OpenAI API key must be provided or set in OPENAI_API_KEY env var.")
+        raise ValueError("API key must be provided or set in OPENAI_API_KEY env var.")
 
     if prompt is None:
         prompt = (

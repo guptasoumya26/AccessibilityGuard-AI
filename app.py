@@ -95,7 +95,6 @@ if run_btn and base_url and pr_url:
     st.info("Step 2: Analyzing with OpenAI Vision...")
     try:
         api_key = os.getenv("OPENAI_API_KEY")
-    custom_prompt = (
         custom_prompt = (
             "List exactly 5 accessibility issues (or best practices) you observe in this screenshot. "
             "If there are fewer than 5, fill the remaining points with 'No issue found.' "
