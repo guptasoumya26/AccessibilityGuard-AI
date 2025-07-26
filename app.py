@@ -10,7 +10,6 @@ import pandas as pd
 import plotly.express as px
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 st.markdown("""
     <style>
@@ -56,16 +55,19 @@ pr_url = st.text_input("PR URL (feature branch, preview, etc.)", "http://localho
 run_btn = st.button("Compare Accessibility")
 
 def diff_reports(base_report, pr_report):
-    base_points = [line for line in base_report.splitlines() if line.strip()]
-    pr_points = [line for line in pr_report.splitlines() if line.strip()]
-    max_len = max(len(base_points), len(pr_points))
-    base_points += [''] * (max_len - len(base_points))
-    pr_points += [''] * (max_len - len(pr_points))
-    base_points += [''] * (max_len - len(base_points))
-    pr_points += [''] * (max_len - len(pr_points))
+    # Clean and filter out "No issue found." entries and empty lines
+    base_points = [line.strip() for line in base_report.splitlines() 
+                   if line.strip() and "no issue found" not in line.lower()]
+    pr_points = [line.strip() for line in pr_report.splitlines() 
+                 if line.strip() and "no issue found" not in line.lower()]
+    
+    # Convert to sets for comparison
     base_set = set(base_points)
     pr_set = set(pr_points)
-    new_issues = [pt for pt in pr_points if pt and pt not in base_set]
+    
+    # Find issues that are in PR but not in base
+    new_issues = [issue for issue in pr_points if issue not in base_set]
+    
     return "\n".join(new_issues) if new_issues else "No new accessibility issues found!"
 
 def extract_issue_types(report):
@@ -95,13 +97,16 @@ if run_btn and base_url and pr_url:
     with col2:
         st.image(pr_screenshot, caption="PR Screenshot", use_container_width=True)
 
-    st.info("Step 2: Analyzing with OpenAI Vision...")
+    st.info("Step 2: Analyzing with Vision LLM...")
     try:
         api_key = os.getenv("OPENAI_API_KEY")
         custom_prompt = (
-            "List exactly 5 accessibility issues (or best practices) you observe in this screenshot. "
-            "If there are fewer than 5, fill the remaining points with 'No issue found.' "
-            "Format as a numbered list."
+            "Analyze this web page screenshot for accessibility issues. "
+            "List up to 5 specific accessibility problems you can identify "
+            "(such as poor color contrast, missing alt text, unclear focus indicators, missing labels, ARIA issues, etc.). "
+            "Only list actual issues you can observe - do not include placeholder text. "
+            "If fewer than 5 issues are found, only list the real issues. "
+            "Format as a numbered list with specific, actionable descriptions."
         )
         base_report = analyze_screenshot_with_openai_vision(base_screenshot, api_key=api_key, prompt=custom_prompt)
         pr_report = analyze_screenshot_with_openai_vision(pr_screenshot, api_key=api_key, prompt=custom_prompt)
