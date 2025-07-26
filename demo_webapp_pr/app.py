@@ -10,26 +10,18 @@ def home():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Demo Web App - Base</title>
+        <title>Demo Web App - PR Version</title>
         <style>
             button {
-                color: #212121;
-                background: #ffd600;
-                border: 2px solid #212121;
+                color: #e0e0e0; /* Low contrast text */
+                background: #f5f5f5; /* Low contrast background */
+                border: 1px solid #e0e0e0;
                 padding: 12px 24px;
                 font-size: 1.1rem;
-                font-weight: bold;
                 border-radius: 4px;
                 cursor: pointer;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-                transition: background 0.2s, color 0.2s;
             }
-            button:focus, button:hover {
-                outline: 3px solid #ff9800;
-                outline-offset: 2px;
-                background: #fffde7;
-                color: #0053a0;
-            }
+            /* No focus indicator */
             img {
                 display: block;
                 margin-top: 16px;
@@ -40,14 +32,14 @@ def home():
     </head>
     <body>
         <main>
-            <h1>Welcome to the Base Version</h1>
-            <button aria-label="Accessible Button with good contrast and focus indicator">Accessible Button</button>
-            <img src="/static/logo.png" alt="Company logo: placeholder image for demo web app" />
-            <p>Tab to the button to see a visible focus indicator.</p>
+            <h1>Welcome to the PR Version</h1>
+            <button>Low Contrast Button</button>
+            <img src="/static/logo.png"> <!-- Missing alt text -->
+            <p>Tab to the button to see a visible focus indicator. (But there isn't one!)</p>
         </main>
     </body>
     </html>
     ''')
 
 if __name__ == '__main__':
-    app.run(port=8000)
+    app.run(port=8001)
