@@ -102,11 +102,14 @@ if run_btn and base_url and pr_url:
         api_key = os.getenv("OPENAI_API_KEY")
         custom_prompt = (
             "Analyze this web page screenshot for accessibility issues. "
-            "List up to 5 specific accessibility problems you can identify "
-            "(such as poor color contrast, missing alt text, unclear focus indicators, missing labels, ARIA issues, etc.). "
-            "Only list actual issues you can observe - do not include placeholder text. "
-            "If fewer than 5 issues are found, only list the real issues. "
-            "Format as a numbered list with specific, actionable descriptions."
+            "Be very specific and only mention issues you can actually see and verify in this screenshot. "
+            "For each issue, describe the exact element or location where the problem occurs. "
+            "Examples: 'Button at top-right has insufficient color contrast (appears to be light gray on white)', "
+            "'Image in the main content area lacks visible alt text indicator', "
+            "'Form input field at [location] has no visible label'. "
+            "Do not make generic assumptions - only report what you can specifically observe. "
+            "List up to 5 concrete, location-specific accessibility problems. "
+            "Format as a numbered list."
         )
         base_report = analyze_screenshot_with_openai_vision(base_screenshot, api_key=api_key, prompt=custom_prompt)
         pr_report = analyze_screenshot_with_openai_vision(pr_screenshot, api_key=api_key, prompt=custom_prompt)
