@@ -5,16 +5,46 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     return render_template_string('''
-    <html>
-    <head><title>Demo Web App - Base</title></head>
-    <body>
-        <h1>Welcome to the Base Version</h1>
-        <button style="color: #eee; background: #fff;">Low Contrast Button</button>
-        <img src="/static/logo.png">
-        <p>Tab to the button to see a visible focus indicator.</p>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Demo Web App - Base</title>
         <style>
-            button:focus { outline: 2px solid #ff9800; }
+            button {
+                color: #212121;
+                background: #ffd600;
+                border: 2px solid #212121;
+                padding: 12px 24px;
+                font-size: 1.1rem;
+                font-weight: bold;
+                border-radius: 4px;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+                transition: background 0.2s, color 0.2s;
+            }
+            button:focus, button:hover {
+                outline: 3px solid #ff9800;
+                outline-offset: 2px;
+                background: #fffde7;
+                color: #0053a0;
+            }
+            img {
+                display: block;
+                margin-top: 16px;
+                max-width: 100%;
+                height: auto;
+            }
         </style>
+    </head>
+    <body>
+        <main>
+            <h1>Welcome to the Base Version</h1>
+            <button aria-label="Accessible Button with good contrast and focus indicator">Accessible Button</button>
+            <img src="/static/logo.png" alt="Company logo: placeholder image for demo web app" />
+            <p>Tab to the button to see a visible focus indicator.</p>
+        </main>
     </body>
     </html>
     ''')
