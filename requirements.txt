@@ -1,0 +1,6 @@
+openai
+selenium
+streamlit
+pillow
+requests
+flask
